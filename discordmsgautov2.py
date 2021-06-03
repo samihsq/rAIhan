@@ -3,6 +3,7 @@ import json,time
 import random
 import text2emotion as te
 import pandas as pd
+import csv
 from config import getCreds, getCompliments, getScope, getMisc
 
 conn = http.client.HTTPSConnection("discord.com")
@@ -38,12 +39,13 @@ def createCompliment():
             reader = csv.reader(f)
             for row in reader:
                 reactions.append(row[0])
-            
-    print(reactions, " + ", sum)
-    daMessage = ""#"bre, you really said " + daMessageContent
-    daMessage += reactions[random.randint(0,len(reactions))-1]
-    return daMessage
-
+        daMessage = ""#"bre, you really said " + daMessageContent
+        daMessage += reactions[random.randint(0,len(reactions))-1]
+        print(daMessageContent + ": " + list(filter)[0] + " -> " + daMessage)
+        return daMessage
+    else:
+        return ""
+    del reactions[:]
 while True:
     for channelID in list(channelIDtoMsg.keys()):
         conn = http.client.HTTPSConnection("discord.com")
@@ -63,16 +65,16 @@ while True:
             daMessageID = json.loads(data.decode("utf-8"))[0]["id"]
             daMessageContent = json.loads(data.decode("utf-8"))[0]["content"]
             emotion = te.get_emotion(daMessageContent)
-            print(json.loads(data.decode("utf-8"))[0])
+            #print(json.loads(data.decode("utf-8"))[0])
             channelIDtoMsg[channelID] = json.loads(data.decode("utf-8"))[0]
             if channelIDtoMsg[channelID]["author"]["id"] != reactTo:
-                print(daMessageID)
+                #print(daMessageID)
                 if msgAsReply == True:
                     payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false,\n\"message_reference\": {\"channel_id\": \""+str(channelID)+"\",\n\"guild_id\":\""+str(daGuildID)+"\", \n \"message_id\": \""+str(daMessageID)+"\"}\n}"
                 else:
                     payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false}"
-                print("Payload:"+payload)
+                #print("Payload:"+payload)
+                payload = payload.encode(encoding='utf-8')
                 conn.request("POST", "/api/v9/channels/"+channelID+"/messages", payload, headers)
                 daCount += 1
-                del reactions[:]
     time.sleep(.25)
