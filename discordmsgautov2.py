@@ -48,13 +48,13 @@ while True:
             daMessageContent = json.loads(data.decode("utf-8"))[0]["content"]
             print(json.loads(data.decode("utf-8"))[0])
             channelIDtoMsg[channelID] = json.loads(data.decode("utf-8"))[0]
-            if channelIDtoMsg[channelID]["author"]["id"] == reactTo:
-                print(daMessageID)
-                if msgAsReply == True:
-                    payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false,\n\"message_reference\": {\"channel_id\": \""+str(channelID)+"\",\n\"guild_id\":\""+str(daGuildID)+"\", \n \"message_id\": \""+str(daMessageID)+"\"}\n}"
-                else:
-                    payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false}"
-                print("Payload:"+payload)
-                conn.request("POST", "/api/v9/channels/"+channelID+"/messages", payload, headers)
-                daCount += 1
+            # if channelIDtoMsg[channelID]["author"]["id"] == reactTo:
+            print(daMessageID)
+            if msgAsReply == True:
+                payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false,\n\"message_reference\": {\"channel_id\": \""+str(channelID)+"\",\n\"guild_id\":\""+str(daGuildID)+"\", \n \"message_id\": \""+str(daMessageID)+"\"}\n}"
+            else:
+                payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false}"
+            print("Payload:"+payload)
+            conn.request("POST", "/api/v9/channels/"+channelID+"/messages", payload, headers)
+            daCount += 1
     time.sleep(.25)
