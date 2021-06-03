@@ -2,10 +2,24 @@ import http.client
 import json,time
 import random
 import text2emotion as te
-import pandas as pd
 import csv
+#from textblob.classifiers import NaiveBayesClassifier
 from config import getCreds, getCompliments, getScope, getMisc
 
+
+'''train = [
+     ('I love this sandwich.', 'pos'),
+     ('this is an amazing place!', 'pos'),
+     ('I feel very good about these beers.', 'pos'),
+     ('this is my best work.', 'pos'),
+     ("what an awesome view", 'pos'),
+     ('I do not like this restaurant', 'neg'),
+     ('I am tired of this stuff.', 'neg'),
+     ("I can't deal with this", 'neg'),
+     ('he is my sworn enemy!', 'neg'),
+     ('my boss is horrible.', 'neg')
+ ]
+cl = NaiveBayesClassifier(train)'''
 conn = http.client.HTTPSConnection("discord.com")
 username,password = getCreds()
 payload = "{\"login\":\""+username+"\",\"password\":\""+password+"\"}"
@@ -42,6 +56,8 @@ def createCompliment():
         daMessage = ""#"bre, you really said " + daMessageContent
         daMessage += reactions[random.randint(0,len(reactions))-1]
         print(daMessageContent + ": " + list(filter)[0] + " -> " + daMessage)
+        print(emotion)
+        #print(newemotion.prob("pos"))
         return daMessage
     else:
         return ""
@@ -65,6 +81,7 @@ while True:
             daMessageID = json.loads(data.decode("utf-8"))[0]["id"]
             daMessageContent = json.loads(data.decode("utf-8"))[0]["content"]
             emotion = te.get_emotion(daMessageContent)
+            #newemotion = cl.prob_classify(daMessageContent)
             #print(json.loads(data.decode("utf-8"))[0])
             channelIDtoMsg[channelID] = json.loads(data.decode("utf-8"))[0]
             if channelIDtoMsg[channelID]["author"]["id"] != reactTo:
