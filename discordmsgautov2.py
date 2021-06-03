@@ -1,6 +1,8 @@
 import http.client
 import json,time
 import random
+import text2emotion as te
+import pandas as pd
 from config import getCreds, getCompliments, getScope, getMisc
 
 conn = http.client.HTTPSConnection("discord.com")
@@ -24,8 +26,22 @@ reactTo,channelIDtoMsg,daGuildID = getScope()
 msgAsReply = getMisc()
 
 def createCompliment():
+    reactions = []
+    
+    sum = emotion["Happy"] + emotion["Angry"] + emotion["Surprise"] + emotion["Sad"] + emotion["Fear"]
+    if sum > 0:
+        filter = dict()
+        for key, value in emotion.items():
+            if value != 0:
+                filter[key] = value
+        with open("FilteredCSVFiles/"+str(list(filter)[0])+".csv", "r", encoding='utf-8') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                reactions.append(row[0])
+            
+    print(reactions, " + ", sum)
     daMessage = ""#"bre, you really said " + daMessageContent
-    daMessage += daComplimentList[random.randint(0,len(daComplimentList))-1]
+    daMessage += reactions[random.randint(0,len(reactions))-1]
     return daMessage
 
 while True:
@@ -46,15 +62,17 @@ while True:
         if json.loads(data.decode("utf-8"))[0] != channelIDtoMsg[channelID]:
             daMessageID = json.loads(data.decode("utf-8"))[0]["id"]
             daMessageContent = json.loads(data.decode("utf-8"))[0]["content"]
+            emotion = te.get_emotion(daMessageContent)
             print(json.loads(data.decode("utf-8"))[0])
             channelIDtoMsg[channelID] = json.loads(data.decode("utf-8"))[0]
-            # if channelIDtoMsg[channelID]["author"]["id"] == reactTo:
-            print(daMessageID)
-            if msgAsReply == True:
-                payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false,\n\"message_reference\": {\"channel_id\": \""+str(channelID)+"\",\n\"guild_id\":\""+str(daGuildID)+"\", \n \"message_id\": \""+str(daMessageID)+"\"}\n}"
-            else:
-                payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false}"
-            print("Payload:"+payload)
-            conn.request("POST", "/api/v9/channels/"+channelID+"/messages", payload, headers)
-            daCount += 1
+            if channelIDtoMsg[channelID]["author"]["id"] != reactTo:
+                print(daMessageID)
+                if msgAsReply == True:
+                    payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false,\n\"message_reference\": {\"channel_id\": \""+str(channelID)+"\",\n\"guild_id\":\""+str(daGuildID)+"\", \n \"message_id\": \""+str(daMessageID)+"\"}\n}"
+                else:
+                    payload = "{\"content\": \""+createCompliment()+"\",\n\"nonce\": "+str(daCount)+",\n\"tts\": false}"
+                print("Payload:"+payload)
+                conn.request("POST", "/api/v9/channels/"+channelID+"/messages", payload, headers)
+                daCount += 1
+                del reactions[:]
     time.sleep(.25)
