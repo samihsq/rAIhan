@@ -1,6 +1,6 @@
 **How to Use rAIhan**
 
-First, dm me at ThamThilly#9771 for the private_key.json that will be necessary for the dialogflow to work. I don't want to put this up publicly due to security reasons.
+First, dm me at ThamThilly#9771 for the private_key.json that will be necessary for Dialogflow to function. I don't want to put this up publicly due to security reasons.
 
 To be continued after I make this repo more finalized.
 
