@@ -124,7 +124,7 @@ while True:
             DIALOGFLOW_LANGUAGE_CODE = 'en'
             SESSION_ID = 'me'
 
-            text_to_be_analyzed = daMessageContent
+            text_to_be_analyzed = daMessageContent + " "
 
             session_client = dialogflow.SessionsClient()
             session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
