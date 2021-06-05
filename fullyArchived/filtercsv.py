@@ -1,7 +1,7 @@
 import csv
 import text2emotion as te
 
-with open("../OriginalCSVFiles/General.csv", "r", encoding='utf-8') as source:
+with open("OriginalCSVFiles/General.csv", "r", encoding='utf-8') as source:
     reader = csv.reader(source)
 
     #with open("FilteredCSVFiles/Filtered.csv", "w", encoding='utf-8') as result:
