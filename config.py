@@ -19,8 +19,8 @@ msgAsReply = True
 
 #You don't need to change anything under this
 daChannelDictionary = dict.fromkeys(daChannelList, "")
-***REMOVED***
-***REMOVED***
+def getCreds():
+    return(daEmail,daPassword)
 def getCompliments():
     return(daComplimentList)
 def getScope():
