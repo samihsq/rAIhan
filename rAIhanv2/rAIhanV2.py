@@ -1,6 +1,7 @@
 import http.client
 import json, time
 from config import getCreds
+import random
 
 # LOGIN#
 conn = http.client.HTTPSConnection("discord.com")
@@ -22,6 +23,7 @@ daCount = 0
 
 
 def sendMessage(daChannelID, daMessage):
+    conn = http.client.HTTPSConnection("discord.com")
     global daCount
     payload = ""
 
@@ -35,23 +37,58 @@ def sendMessage(daChannelID, daMessage):
 
     res = conn.getresponse()
     data = res.read()
-    print("Payload:" + payload)
-    conn.request("POST", "/api/v9/channels/" + daChannelID + "/messages", payload, headers)
+    #print("Payload:" + payload)
+    payload = payload.encode(encoding='utf-8')
+    conn.request("POST", "/api/v9/channels/" + str(daChannelID) + "/messages", payload, headers)
     daCount += 1
     time.sleep(.25)
 
 
 def sendReply(daChannelID, daMessage, msgToReply, pingInReply=False, log=True):
+    conn = http.client.HTTPSConnection("discord.com")
     global daCount
+    payload = ""
+
+    headers = {
+        'authorization': daToken,
+        'Content-Type': "application/json"
+    }
+
     payload = """{
     "content": " """ + daMessage + """ ",
     "nonce": """ + str(daCount) + """,
     "tts": false,
-    "message_reference": """ + msgToReply + """
+    "message_reference": {
+        "channel_id":""" + daChannelID + """,
+        "message_id":""" + msgToReply + """
+        }
     }\n"""
-    res = conn.getresponse()
-    data = res.read()
+    payload = payload.encode(encoding='utf-8')
     print("Payload:" + payload)
     conn.request("POST", "/api/v9/channels/" + daChannelID + "/messages", payload, headers)
+
     daCount += 1
     time.sleep(.25)
+
+
+def getMessages(daChannelID, daRange):
+    headers = {
+        'authorization': daToken,
+        'Content-Type': "application/json"
+    }
+    conn.request("GET", "/api/v9/channels/" + str(daChannelID) + "/messages", "", headers)
+    response = conn.getresponse()
+    data = response.read()
+    data = json.loads(data.decode("utf-8"))
+    return (data[0:daRange])
+
+
+fillerwords = ["um", "wait", "one sec"]
+
+def filler(chance):
+    prob = 100/chance
+    fillorno = random.randint(1, round(prob))
+    if fillorno == 1:
+        return True
+    else:
+        return False
